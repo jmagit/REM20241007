@@ -5,6 +5,10 @@
 - [WSL 2 feature on Windows](https://learn.microsoft.com/es-es/windows/wsl/install)
 - [Docker Desktop](https://www.docker.com/get-started/)
 
+### Configuración de puertos dinámicos en Windows
+
+    netsh int ipv4 set dynamic tcp start=51000 num=14536
+
 ### Alternativas a Docker Desktop
 
 - [Podman](https://podman.io/docs/installation)
@@ -21,6 +25,8 @@
 #### Servidor de correo electrónico
 
     docker run -d --name mailhog -p 1025:1025 -p 8025:8025 mailhog/mailhog
+
+    docker network connect jenkins mailhog
 
 #### Control de calidad
 
@@ -54,6 +60,7 @@
 - https://github.com/jmagit/demos-devops
 - https://github.com/jmagit/demos-frontend-angular
 - https://github.com/jmagit/MOCKWebServer
+- https://github.com/spring-projects/spring-petclinic
 
 ## Comandos
 
