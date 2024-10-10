@@ -32,7 +32,7 @@ pipeline {
                         allowMissing: false, 
                         alwaysLinkToLastBuild: false, 
                         keepAll: false, 
-                        reportDir: '/target/site/jacoco/', 
+                        reportDir: 'target/site/jacoco/', 
                         reportFiles: 'index.html', 
                         reportName: 'Informe de cobertura de código', 
                         reportTitles: 'Informe de cobertura de código', 
