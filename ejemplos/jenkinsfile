@@ -53,6 +53,7 @@ pipeline {
         }
         stage("Deploy") {
             steps {
+                input message: 'Despliego? (Click "Proceed" to continue)'
                 sh "mvn install -DskipTests"
             }
         }
