@@ -53,6 +53,9 @@ pipeline {
         }
         stage("Deploy") {
             steps {
+                mail to: 'team@example.com',
+                         subject: "Esperando confirmacion: ${currentBuild.fullDisplayName}",
+                         body: "Something is wrong with ${env.BUILD_URL}"
                 input message: 'Despliego? (Click "Proceed" to continue)'
                 sh "mvn install -DskipTests"
             }
