@@ -56,10 +56,10 @@ pipeline {
                 sh "mvn install -DskipTests"
             }
         }
-        stage("Documentacion") {
-            steps {
-                sh "mvn site"
-            }
-        }
+        // stage("Documentacion") {
+        //     steps {
+        //         sh "mvn site"
+        //     }
+        // }
     }
 }
