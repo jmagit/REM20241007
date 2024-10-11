@@ -1,0 +1,101 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@1436.vfa_244484591f">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2214.vb_b_34b_2ea_9b_83"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2214.vb_b_34b_2ea_9b_83">
+      <jobProperties/>
+      <triggers/>
+      <parameters/>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@3969.vdc9d3a_efcc6a_">
+    <script>pipeline {
+    agent any
+
+    tools {
+        maven &quot;maven-last&quot;
+    }
+
+    stages {
+        stage(&apos;Clonar&apos;) {
+            steps {
+                git &apos;https://github.com/jmagit/demos-devops.git&apos;
+            }
+        }
+        stage(&apos;Compile&apos;) {
+            steps {
+                sh &quot;mvn clean compile&quot;
+            }
+        }
+        stage(&apos;Unit test&apos;) {
+            steps {
+                sh &quot;mvn -Dmaven.test.failure.ignore=true test&quot;
+            }
+            post {
+                always {
+                    mail to: &apos;team@example.com&apos;,
+                         subject: &quot;Failed Pipeline: ${currentBuild.fullDisplayName}&quot;,
+                         body: &quot;Something is wrong with ${env.BUILD_URL}&quot;
+                }
+                success {
+                    junit &apos;**/target/surefire-reports/TEST-*.xml&apos;
+                    publishHTML([
+                        allowMissing: false, 
+                        alwaysLinkToLastBuild: false, 
+                        keepAll: false, 
+                        reportDir: &apos;target/site/jacoco/&apos;, 
+                        reportFiles: &apos;index.html&apos;, 
+                        reportName: &apos;Informe de cobertura de código&apos;, 
+                        reportTitles: &apos;Informe de cobertura de código&apos;, 
+                        useWrapperFileDirectly: true
+                        ])
+                }
+            }
+        }
+        stage(&quot;SonarQube Analysis&quot;) {
+            steps {
+                withSonarQubeEnv(&apos;SonarQubeDockerServer&apos;) {
+                    sh &apos;mvn -DskipTests verify sonar:sonar&apos;
+                }
+                timeout(2) { // time: 2 unit: &apos;MINUTES&apos;
+                  // In case of SonarQube failure or direct timeout exceed, stop Pipeline
+                  waitForQualityGate abortPipeline: waitForQualityGate().status != &apos;OK&apos;
+                }
+            }
+        }
+        stage(&quot;Build&quot;) {
+            steps {
+                sh &quot;mvn package -DskipTests&quot;
+            }
+            post {
+                success {
+                    archiveArtifacts &apos;target/*.jar&apos;
+                }
+            }
+        }
+        stage(&quot;Deploy&quot;) {
+            steps {
+                // mail to: &apos;team@example.com&apos;,
+                //          subject: &quot;Esperando confirmacion: ${currentBuild.fullDisplayName}&quot;,
+                //          body: &quot;Something is wrong with ${env.BUILD_URL}&quot;
+                // input message: &apos;Despliego? (Click &quot;Proceed&quot; to continue)&apos;
+                sh &quot;mvn install -DskipTests&quot;
+            }
+        }
+        // stage(&quot;Documentacion&quot;) {
+        //     steps {
+        //         sh &quot;mvn site&quot;
+        //     }
+        // }
+    }
+}
+</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

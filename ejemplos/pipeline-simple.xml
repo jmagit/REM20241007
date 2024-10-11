@@ -1,0 +1,87 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@1436.vfa_244484591f">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2214.vb_b_34b_2ea_9b_83"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2214.vb_b_34b_2ea_9b_83">
+      <jobProperties/>
+      <triggers/>
+      <parameters>
+        <string>miNombre</string>
+        <string>modo</string>
+      </parameters>
+      <options/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>miNombre</name>
+          <description>Dame tu nombre?</description>
+          <defaultValue>Pepito</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>modo</name>
+          <description>Dame el modo:</description>
+          <choices>
+            <string>test</string>
+            <string>dev</string>
+            <string>prod</string>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@3969.vdc9d3a_efcc6a_">
+    <script>pipeline {
+    agent any
+    
+    environment {
+        NOMBRE = &apos;mundo&apos;
+    }
+    parameters {
+        string(name: &apos;miNombre&apos;, defaultValue: &apos;Pepito&apos;, description: &apos;Dame tu nombre?&apos;)
+        choice choices: [&apos;test&apos;, &apos;dev&apos;, &apos;prod&apos;], description: &apos;Dame el modo:&apos;, name: &apos;modo&apos;
+    }
+    tools {
+        maven &apos;maven-last&apos; 
+    }
+
+    stages {
+        stage(&apos;Saluda&apos;) {
+            steps {
+                echo &apos;Hello $NOMBRE&apos;
+                sh &apos;echo Hello $NOMBRE&apos;
+                echo &quot;Hello ${&quot;don &quot; + NOMBRE}&quot;
+                echo &quot;Hello ${params.miNombre}, modo: ${params.modo}&quot;
+            }
+        }
+        stage(&apos;Cotilla&apos;) {
+            environment {
+                NOMBRE = &apos;&lt;-------------------------&apos;
+            }
+            steps {
+                sh &apos;env&apos;
+                
+            }
+        }
+        stage(&apos;version&apos;) {
+            steps {
+                sh &apos;mvn --version&apos;
+                withMaven(maven: &apos;maven_3_8_8&apos;) {
+                    sh &apos;mvn --version&apos;
+                }
+                
+            }
+        }
+    }
+}
+</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
